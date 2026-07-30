@@ -28,13 +28,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Checkstyle
-        run: ./gradlew checkstyleMain checkstyleTest --no-daemon
+        run: gradle checkstyleMain checkstyleTest --no-daemon
 
       - name: SpotBugs
-        run: ./gradlew spotbugsMain spotbugsTest --no-daemon
+        run: gradle spotbugsMain spotbugsTest --no-daemon
 
       - name: Run tests
-        run: ./gradlew test --no-daemon
+        run: gradle test --no-daemon
 
       - name: Archive test reports
         if: always()
