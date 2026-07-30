@@ -331,7 +331,8 @@ public class ReActAgent {
 
         @Override
         public String toString() {
-            return "AgentResult{answer='" + answer.substring(0, Math.min(answer.length(), 100))
+            String ans = answer != null ? answer.substring(0, Math.min(answer.length(), 100)) : "null";
+            return "AgentResult{answer='" + ans
                     + "', steps=" + steps.size() + ", iterations=" + iterations + "}";
         }
     }

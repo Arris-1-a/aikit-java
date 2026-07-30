@@ -171,7 +171,7 @@ public class PromptTemplate {
 
             if (current instanceof Map) {
                 current = ((Map<String, Object>) current).get(fieldName);
-            } else if (current != null) {
+            } else if (current != null && !fieldName.isEmpty()) {
                 // Try reflection for POJO field access
                 try {
                     String getter = "get" + Character.toUpperCase(fieldName.charAt(0))

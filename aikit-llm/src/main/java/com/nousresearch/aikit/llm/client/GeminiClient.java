@@ -10,6 +10,8 @@ import com.nousresearch.aikit.core.model.ChatRequest;
 import com.nousresearch.aikit.core.model.ChatResponse;
 import okhttp3.Request;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +47,9 @@ public class GeminiClient extends AbstractLLMClient {
     @Override
     protected String getChatEndpoint() {
         // Gemini models endpoint includes the model name in the URL path
-        return baseUrl + "/models/" + defaultModel + ":generateContent?key=" + apiKey;
+        // URL-encode the API key to handle special characters safely
+        String encodedKey = URLEncoder.encode(apiKey, StandardCharsets.UTF_8);
+        return baseUrl + "/models/" + defaultModel + ":generateContent?key=" + encodedKey;
     }
 
     @Override
@@ -138,7 +142,7 @@ public class GeminiClient extends AbstractLLMClient {
      * Converts a Gemini response to an AiKit ChatResponse.
      */
     private ChatResponse convertFromGeminiResponse(GeminiResponse gr) {
-        String contentText = "";
+        StringBuilder contentText = new StringBuilder();
         AtomicInteger promptTokens = new AtomicInteger(0);
         AtomicInteger completionTokens = new AtomicInteger(0);
 
@@ -147,7 +151,7 @@ public class GeminiClient extends AbstractLLMClient {
                 if (candidate.content != null && candidate.content.parts != null) {
                     for (GeminiPart part : candidate.content.parts) {
                         if (part.text != null) {
-                            contentText += part.text;
+                            contentText.append(part.text);
                         }
                     }
                 }
@@ -159,7 +163,7 @@ public class GeminiClient extends AbstractLLMClient {
             completionTokens.set(gr.usageMetadata.candidatesTokenCount);
         }
 
-        ChatMessage message = ChatMessage.assistant(contentText);
+        ChatMessage message = ChatMessage.assistant(contentText.toString());
 
         return ChatResponse.builder()
                 .model(defaultModel)

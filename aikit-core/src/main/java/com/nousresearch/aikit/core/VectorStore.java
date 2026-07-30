@@ -1,5 +1,6 @@
 package com.nousresearch.aikit.core;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +93,16 @@ public interface VectorStore<T> {
      * @param path the file path to load from
      */
     void load(String path);
+
+    /**
+     * Returns all entries in the store. Default returns empty list;
+     * implementations should override to provide actual entries.
+     *
+     * @return all vector entries
+     */
+    default List<VectorEntry<T>> entries() {
+        return Collections.emptyList();
+    }
 
     /**
      * A single entry in the vector store.

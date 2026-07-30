@@ -96,11 +96,14 @@ public abstract class AbstractEmbeddingProvider implements EmbeddingProvider {
         int uncachedIdx = 0;
         for (int i = 0; i < texts.size(); i++) {
             if (results[i] == null) {
-                results[i] = embeddings[uncachedIdx];
-                if (cache != null) {
-                    cache.put(texts.get(i), embeddings[uncachedIdx]);
+                if (uncachedIdx < embeddings.length) {
+                    results[i] = embeddings[uncachedIdx];
+                    if (cache != null) {
+                        cache.put(texts.get(i), embeddings[uncachedIdx]);
+                    }
+                    uncachedIdx++;
                 }
-                uncachedIdx++;
+                // else: provider returned fewer embeddings than expected
             }
         }
 

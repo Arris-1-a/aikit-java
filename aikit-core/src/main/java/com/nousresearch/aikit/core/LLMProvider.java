@@ -4,6 +4,7 @@ import com.nousresearch.aikit.core.model.ChatMessage;
 import com.nousresearch.aikit.core.model.ChatRequest;
 import com.nousresearch.aikit.core.model.ChatResponse;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -74,11 +75,11 @@ public interface LLMProvider extends AutoCloseable {
         ChatRequest.Builder builder = ChatRequest.builder()
                 .model(getDefaultModel());
         if (systemPrompt != null && !systemPrompt.isEmpty()) {
-            builder.messages(java.util.List.of(
+            builder.messages(List.of(
                     ChatMessage.system(systemPrompt),
                     ChatMessage.user(userMessage)));
         } else {
-            builder.messages(java.util.List.of(ChatMessage.user(userMessage)));
+            builder.messages(List.of(ChatMessage.user(userMessage)));
         }
         ChatResponse response = chat(builder.build());
         return response.getFirstContent();

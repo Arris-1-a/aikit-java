@@ -121,6 +121,21 @@ public class InMemoryVectorStore<T> implements VectorStore<T> {
     }
 
     /**
+     * Returns all entries in the store for persistence and iteration.
+     */
+    @Override
+    public List<VectorEntry<T>> entries() {
+        List<VectorEntry<T>> result = new ArrayList<>(size());
+        for (String id : index.getNodeIds()) {
+            HnswNode<T> node = index.getNode(id);
+            if (node != null) {
+                result.add(new VectorEntry<>(id, node.getVector(), node.getMetadata()));
+            }
+        }
+        return result;
+    }
+
+    /**
      * Checks if a search result matches the given metadata filter.
      */
     private boolean matchesFilter(VectorSearchResult<T> result, Map<String, Object> filter) {

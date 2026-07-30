@@ -154,7 +154,8 @@ public class ToolChain {
 
         @Override
         public String toString() {
-            return "ToolChainResult{" + toolName + ": " + output.substring(0, Math.min(output.length(), 80)) + "}";
+            String out = output != null ? output.substring(0, Math.min(output.length(), 80)) : "null";
+            return "ToolChainResult{" + toolName + ": " + out + "}";
         }
     }
 }

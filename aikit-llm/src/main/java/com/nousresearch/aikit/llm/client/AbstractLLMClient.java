@@ -198,6 +198,9 @@ public abstract class AbstractLLMClient implements LLMProvider {
             Thread.currentThread().interrupt();
             eventSource.cancel();
             throw new AiKitException("SSE stream interrupted", e);
+        } finally {
+            // Ensure EventSource is cancelled to prevent resource leaks
+            eventSource.cancel();
         }
     }
 
@@ -301,8 +304,17 @@ public abstract class AbstractLLMClient implements LLMProvider {
 
         if (statusCode == 429) {
             String retryAfter = response.header("Retry-After");
-            Duration waitDuration = Duration.ofSeconds(
-                    retryAfter != null ? Long.parseLong(retryAfter) : 5);
+            Duration waitDuration;
+            if (retryAfter != null) {
+                try {
+                    // Retry-After can be seconds (integer) or HTTP-date
+                    waitDuration = Duration.ofSeconds(Long.parseLong(retryAfter));
+                } catch (NumberFormatException e) {
+                    waitDuration = Duration.ofSeconds(5);
+                }
+            } else {
+                waitDuration = Duration.ofSeconds(5);
+            }
             throw new RateLimitException(
                     "Rate limit exceeded (HTTP 429): " + responseBody, waitDuration);
         }

@@ -46,6 +46,11 @@ public class RetryPolicy {
     private static final Set<Integer> RETRYABLE_STATUS_CODES = new HashSet<>(
             Arrays.asList(429, 500, 502, 503, 504));
 
+    // Common network error message substrings
+    private static final String[] RETRYABLE_MESSAGE_SUBSTRINGS = {
+        "timeout", "connection", "network", "reset", "broken pipe", "refused"
+    };
+
     private final int maxRetries;
     private final Duration baseDelay;
     private final Duration maxDelay;
@@ -126,9 +131,15 @@ public class RetryPolicy {
         }
 
         // Network/timeout errors are retryable
-        String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
-        return msg.contains("timeout") || msg.contains("connection")
-                || msg.contains("network") || msg.contains("reset");
+        if (e.getMessage() != null) {
+            String msg = e.getMessage().toLowerCase();
+            for (String substr : RETRYABLE_MESSAGE_SUBSTRINGS) {
+                if (msg.contains(substr)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

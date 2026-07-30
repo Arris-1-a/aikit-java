@@ -172,13 +172,13 @@ public class AnthropicClient extends AbstractLLMClient {
      * Converts an Anthropic response back to AiKit format.
      */
     private ChatResponse convertFromAnthropicResponse(AnthropicResponse ar) {
-        String contentText = "";
+        StringBuilder contentText = new StringBuilder();
         List<ToolCall> toolCalls = new ArrayList<>();
 
         if (ar.content != null) {
             for (AnthropicContentBlock block : ar.content) {
                 if ("text".equals(block.type) && block.text != null) {
-                    contentText += block.text;
+                    contentText.append(block.text);
                 } else if ("tool_use".equals(block.type)) {
                     try {
                         String argsJson = block.input != null
@@ -195,7 +195,7 @@ public class AnthropicClient extends AbstractLLMClient {
 
         ChatMessage assistantMsg = ChatMessage.builder()
                 .role(ChatMessage.ROLE_ASSISTANT)
-                .content(contentText.isEmpty() ? null : contentText)
+                .content(contentText.length() == 0 ? null : contentText.toString())
                 .toolCalls(toolCalls.isEmpty() ? null : toolCalls)
                 .build();
 

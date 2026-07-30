@@ -87,8 +87,21 @@ public final class VectorStorePersistence {
     private static <T> void saveAsJson(VectorStore<T> store, String path) {
         try {
             List<Map<String, Object>> entries = new ArrayList<>();
-            // We iterate using the store's API — this is approximate
-            // as VectorStore doesn't expose iteration; subclasses can override
+            // Iterate using the store's entries() method
+            for (VectorStore.VectorEntry<T> entry : store.entries()) {
+                Map<String, Object> entryMap = new LinkedHashMap<>();
+                entryMap.put("id", entry.getId());
+                // Convert float[] to List<Double> for JSON serialization
+                List<Double> vecList = new ArrayList<>(entry.getVector().length);
+                for (float v : entry.getVector()) {
+                    vecList.add((double) v);
+                }
+                entryMap.put("vector", vecList);
+                if (entry.getMetadata() != null) {
+                    entryMap.put("metadata", entry.getMetadata());
+                }
+                entries.add(entryMap);
+            }
 
             Map<String, Object> wrapper = new LinkedHashMap<>();
             wrapper.put("version", 1);
@@ -157,9 +170,32 @@ public final class VectorStorePersistence {
             dos.writeInt(MAGIC);
             dos.writeInt(VERSION);
 
-            // Placeholder — actual binary save requires iterating the store
-            // which depends on implementation details
-            dos.writeInt(0); // count
+            // Collect entries before writing to get accurate count
+            List<VectorStore.VectorEntry<T>> entryList = store.entries();
+            dos.writeInt(entryList.size()); // count
+
+            for (VectorStore.VectorEntry<T> entry : entryList) {
+                // Write ID
+                byte[] idBytes = entry.getId().getBytes(StandardCharsets.UTF_8);
+                dos.writeInt(idBytes.length);
+                dos.write(idBytes);
+
+                // Write vector
+                float[] vector = entry.getVector();
+                dos.writeInt(vector.length);
+                for (float v : vector) {
+                    dos.writeFloat(v);
+                }
+
+                // Write metadata as JSON
+                byte[] metaBytes = entry.getMetadata() != null
+                        ? OBJECT_MAPPER.writeValueAsBytes(entry.getMetadata())
+                        : new byte[0];
+                dos.writeInt(metaBytes.length);
+                if (metaBytes.length > 0) {
+                    dos.write(metaBytes);
+                }
+            }
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to save vector store as binary: " + path, e);
