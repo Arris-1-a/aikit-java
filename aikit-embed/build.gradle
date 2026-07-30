@@ -1,0 +1,7 @@
+dependencies {
+    api project(':aikit-core')
+    implementation project(':aikit-llm')
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+}

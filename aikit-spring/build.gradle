@@ -1,0 +1,25 @@
+plugins {
+    id 'io.spring.dependency-management'
+    id 'org.springframework.boot'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    api project(':aikit-core')
+    api project(':aikit-llm')
+    api project(':aikit-vector')
+    api project(':aikit-embed')
+    api project(':aikit-prompt')
+    api project(':aikit-agent')
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

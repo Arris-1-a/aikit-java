@@ -1,0 +1,9 @@
+dependencies {
+    api project(':aikit-core')
+    implementation "com.squareup.okhttp3:okhttp:${okhttpVersion}"
+    implementation "com.squareup.okhttp3:okhttp-sse:${okhttpVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${okhttpVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
+}

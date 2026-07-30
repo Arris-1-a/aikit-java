@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'checkstyle'
+    id 'com.github.spotbugs' version '6.0.7' apply false
+    id 'io.spring.dependency-management' version '1.1.4' apply false
+    id 'org.springframework.boot' version '3.2.2' apply false
+}
+
+allprojects {
+    group = 'com.nousresearch.aikit'
+    version = '1.0.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'checkstyle'
+    apply plugin: 'com.github.spotbugs'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    checkstyle {
+        toolVersion = '10.12.5'
+        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+        maxErrors = 0
+        maxWarnings = 0
+    }
+
+    spotbugs {
+        toolVersion = '4.8.3'
+        excludeFilter = rootProject.file('config/spotbugs/spotbugs-exclude.xml')
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
+    javadoc {
+        options.encoding = 'UTF-8'
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+        testImplementation 'org.assertj:assertj-core:3.25.2'
+        testImplementation 'org.mockito:mockito-core:5.8.0'
+        testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
+
+        compileOnly 'com.github.spotbugs:spotbugs-annotations:4.8.3'
+    }
+}
+
+// Version catalog for dependency management
+ext {
+    jacksonVersion = '2.16.1'
+    okhttpVersion = '4.12.0'
+    slf4jVersion = '2.0.11'
+}
+
+print("Build file created")

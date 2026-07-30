@@ -1,0 +1,9 @@
+rootProject.name = 'aikit-java'
+
+include 'aikit-core'
+include 'aikit-llm'
+include 'aikit-vector'
+include 'aikit-embed'
+include 'aikit-prompt'
+include 'aikit-agent'
+include 'aikit-spring'
